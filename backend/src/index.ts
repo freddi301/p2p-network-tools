@@ -138,7 +138,7 @@ swarm.on("connection", (socket: any, info: any) => {
       }
     }
   });
-  const lookupIntervalId = setTimeout(() => {
+  const lookupIntervalId = setInterval(() => {
     for (const { hash, block } of repo.values()) {
       if (!block) {
         encoder.write({
@@ -149,7 +149,7 @@ swarm.on("connection", (socket: any, info: any) => {
     }
   }, 10 * 1000);
   decoder.on("close", () => {
-    clearTimeout(lookupIntervalId);
+    clearInterval(lookupIntervalId);
   });
 });
 swarm.on("disconnection", (socket: any, info: any) => {
