@@ -5,7 +5,6 @@ import { BackendSelect } from "./components/BackendSelect";
 import { colors } from "./components/colors";
 import { ImportSelect } from "./components/ImportSelect";
 import {
-  StyledSimpleAction,
   StyledSimpleActionSeparator,
   StyledSimpleButton,
 } from "./components/ui";
