@@ -1,12 +1,14 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "dist/index.js",
   "license": "GPL-3.0",
   "private": true,
+  "bin": "dist/index.js",
   "scripts": {
     "start": "tsc && node dist/index.js",
-    "start:watch": "ts-node-dev --respawn ./src/index.ts"
+    "start:watch": "ts-node-dev --respawn ./src/index.ts",
+    "build": "tsc"
   },
   "devDependencies": {
     "@types/cbor": "^5.0.1",
