@@ -22,21 +22,12 @@ server.listen(port);
 
 export type API = typeof api;
 const api = {
-  async getAllHashInfo() {
-    return Array.from(repo.values(), ({ hash, size }) => ({
+  async getAll() {
+    return Array.from(repo.values(), ({ hash, size, block }) => ({
       hash,
       size,
+      block
     }));
-  },
-  async getBlockOfHash(hash: Buffer) {
-    const block = repo.get(hash.toString())?.block;
-    console.log(
-      "get block of hash",
-      hash.toString("hex"),
-      block?.length,
-      block?.toString()
-    );
-    return block;
   },
   async addHash(hash: Buffer) {
     if (!repo.has(hash.toString())) {

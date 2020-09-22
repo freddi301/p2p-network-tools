@@ -1,6 +1,5 @@
 import React, {
   useCallback,
-  useEffect,
   useLayoutEffect,
   useRef,
   useState,
@@ -9,7 +8,6 @@ import { css } from "styled-components/macro";
 import { useCallbackOnExternalEvent } from "./useCallbackOnExternalEvent";
 import { ListItem, StyledSimpleAction, StyledSimpleInput } from "./ui";
 import { colors } from "./colors";
-import { websocketRpcHandles } from "./App";
 
 export function BackendSelect({
   selected,
@@ -135,7 +133,6 @@ export function BackendSelect({
                   </>
                 }
               >
-                <ConnectionStatus backend={backend} />
               </ListItem>
             );
           })}
@@ -144,39 +141,3 @@ export function BackendSelect({
     </div>
   );
 }
-
-function ConnectionStatus({ backend }: { backend: string }) {
-  const {
-    connect,
-    disconnect,
-    getStatus,
-    subscribeStatus,
-  } = websocketRpcHandles.get(backend);
-  const [status, setStatus] = useState<"closed" | "connecting" | "open">(
-    getStatus
-  );
-  useEffect(() => subscribeStatus(setStatus), [subscribeStatus]);
-  return (
-    <div
-      css={css`
-        margin-left: 1ch;
-        color: ${connectionColors[status]};
-      `}
-      onClick={() => {
-        if (status === "closed") {
-          connect();
-        } else {
-          disconnect();
-        }
-      }}
-    >
-      ⬤
-    </div>
-  );
-}
-
-const connectionColors = {
-  closed: colors.red,
-  connecting: colors.yellow,
-  open: colors.green,
-};
