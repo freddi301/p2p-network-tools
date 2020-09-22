@@ -68,7 +68,12 @@ function hashFromBlock(block: Buffer) {
 }
 
 const swarm = hyperswarm({ queue: { multiplex: true } });
+swarm.join(crypto.createHash("sha256").update("p2p-network-tools").digest(), {
+  lookup: true,
+  announce: true,
+});
 swarm.on("connection", (socket: any, info: any) => {
+  console.log("connection");
   infos.add(info);
   const decoder = new CBOR.Decoder();
   socket.pipe(decoder);
