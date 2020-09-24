@@ -1,9 +1,10 @@
 {
-  "name": "backend",
-  "version": "1.0.0",
-  "main": "dist/index.js",
-  "license": "GPL-3.0",
+  "name": "p2p-network-tools-backend",
+  "version": "0.0.0",
   "private": true,
+  "license": "GPL-3.0",
+  "author": "Frederik Batuna <gobi301@gmail.com>",
+  "main": "dist/index.js",
   "bin": "dist/index.js",
   "scripts": {
     "start": "tsc && node dist/index.js",

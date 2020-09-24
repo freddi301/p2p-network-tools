@@ -1,0 +1,28 @@
+{
+  "name": "p2p-network-tools-desktop-electron",
+  "description": "p2p sharing app",
+  "version": "0.0.0",
+  "private": true,
+  "license": "GPL-3.0",
+  "author": "Frederik Batuna <gobi301@gmail.com>",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "copy": "cd ../frontend && yarn build && cd ../desktop-electron && rm -rf frontend && cp -r ../frontend/build frontend",
+    "package": "yarn copy && yarn dist",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "devDependencies": {
+    "electron": "^10.1.2",
+    "electron-builder": "^22.8.1"
+  },
+  "build": {
+    "appId": "p2p-network-tools-desktop-electron",
+    "mac": {
+      "category": "your.app.category.type"
+    },
+    "files": ["frontend/**/*"]
+  }
+}

@@ -1,8 +1,9 @@
 {
-  "name": "frontend",
-  "version": "0.1.0",
+  "name": "p2p-network-tools-frontend",
+  "version": "0.0.0",
   "private": true,
   "license": "GPL-3.0",
+  "author": "Frederik Batuna <gobi301@gmail.com>",
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
@@ -42,5 +43,6 @@
     "@types/node": "^12.0.0",
     "@types/react": "^16.9.0",
     "@types/react-dom": "^16.9.0"
-  }
+  },
+  "homepage": "."
 }
