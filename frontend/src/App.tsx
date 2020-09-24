@@ -4,10 +4,7 @@ import { rpc } from "./components/api";
 import { BackendSelect } from "./components/BackendSelect";
 import { colors } from "./components/colors";
 import { ImportSelect } from "./components/ImportSelect";
-import {
-  StyledSimpleActionSeparator,
-  StyledSimpleButton,
-} from "./components/ui";
+import { StyledSimpleActionSeparator } from "./components/ui";
 import { useBackends } from "./components/useBackends";
 
 export default function App() {
@@ -17,13 +14,10 @@ export default function App() {
     list: backendList,
   } = useBackends();
   const [selectedBackend, setSelectedBackend] = useState("localhost:8086");
-  const { addHash, addBlock, all, refresh } = useApi(selectedBackend);
+  const { addHash, addBlock, all } = useApi(selectedBackend);
   useEffect(() => {
     addBackend("localhost:8086");
-    setTimeout(() => {
-      refresh();
-    }, 1000);
-  }, [addBackend, refresh]);
+  }, [addBackend]);
   return (
     <div
       css={css`
@@ -151,14 +145,6 @@ export default function App() {
         <StyledSimpleActionSeparator />
         <ImportSelect onAddHash={addHash} onAddBlock={addBlock} />
         <StyledSimpleActionSeparator />
-        <StyledSimpleButton
-          onClick={() => {
-            refresh();
-          }}
-        >
-          refresh
-        </StyledSimpleButton>
-        <StyledSimpleActionSeparator />
       </div>
     </div>
   );
@@ -179,5 +165,9 @@ function useApi(backend: string) {
       setAll(data);
     });
   }, [backend]);
-  return { all, addBlock, addHash, refresh };
+  useEffect(() => {
+    const intervalId = setInterval(refresh, 1000);
+    return () => clearInterval(intervalId);
+  }, [refresh]);
+  return { all, addBlock, addHash };
 }

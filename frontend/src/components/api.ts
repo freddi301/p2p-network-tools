@@ -1,6 +1,6 @@
 import CBOR from "cbor";
 
-export type API = import("../../../backend/src").API;
+export type API = import("../../../backend/src/node").API;
 
 const websockets = new Map<string, WebSocket>();
 let nextRpcId = 1;

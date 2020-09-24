@@ -10,8 +10,10 @@
     "start": "electron .",
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
-    "copy": "cd ../frontend && yarn build && cd ../desktop-electron && rm -rf frontend && cp -r ../frontend/build frontend",
-    "package": "yarn copy && yarn dist",
+    "copy:frontend": "cd ../frontend && yarn && yarn build && cd ../desktop-electron && rm -rf frontend && cp -r ../frontend/build frontend",
+    "build:backend": "cd ../backend && yarn && yarn build",
+    "import-dependencies": "yarn copy:frontend && yarn build:backend && yarn",
+    "package": "yarn import-dependencies && yarn dist",
     "postinstall": "electron-builder install-app-deps"
   },
   "devDependencies": {
@@ -20,9 +22,27 @@
   },
   "build": {
     "appId": "p2p-network-tools-desktop-electron",
+    "files": [
+      "index.js",
+      "index.html",
+      "frontend/**/*",
+      "backend/**/*"
+    ],
     "mac": {
       "category": "your.app.category.type"
     },
-    "files": ["frontend/**/*"]
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    }
+  },
+  "dependencies": {
+    "backend": "file:../backend"
   }
 }
