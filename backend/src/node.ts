@@ -2,36 +2,7 @@ import crypto from "crypto";
 import CBOR from "cbor";
 // @ts-ignore
 import hyperswarm from "hyperswarm";
-
-type Protocol = Query | Response;
-
-type Query =
-  | {
-      type: "do you have block of hash";
-      hash: Buffer;
-    }
-  | {
-      type: "give me block of hash";
-      hash: Buffer;
-    };
-
-type Response =
-  | {
-      type: "i do have block of hash";
-      hash: Buffer;
-    }
-  | {
-      type: "i do not have block of hash";
-      hash: Buffer;
-    }
-  | {
-      type: "i give you block of hash";
-      block: Buffer;
-    };
-
-function hashFromBlock(block: Buffer) {
-  return crypto.createHash("sha256").update(block).digest();
-}
+import { hashFromBlock, Protocol } from "./protocol";
 
 const repo = new Map<string, { hash: Buffer; block?: Buffer }>();
 
@@ -59,10 +30,10 @@ swarm.on("connection", (socket: any, info: any) => {
             block,
           } as Protocol);
         } else {
-          encoder.write({
-            type: "i do not have block of hash",
-            hash,
-          } as Protocol);
+          // encoder.write({
+          //   type: "i do not have block of hash",
+          //   hash,
+          // } as Protocol);
         }
         break;
       }
@@ -76,10 +47,10 @@ swarm.on("connection", (socket: any, info: any) => {
             block,
           } as Protocol);
         } else {
-          encoder.write({
-            type: "i do not have block of hash",
-            hash,
-          } as Protocol);
+          // encoder.write({
+          //   type: "i do not have block of hash",
+          //   hash,
+          // } as Protocol);
         }
         break;
       }
@@ -118,7 +89,12 @@ swarm.on("connection", (socket: any, info: any) => {
   };
   askForBlocks();
   const lookupIntervalId = setInterval(askForBlocks, 10 * 1000);
-  decoder.on("close", () => {
+  socket.on("close", () => {
+    console.log("socket close");
+    clearInterval(lookupIntervalId);
+  });
+  socket.on("error", (error: any) => {
+    console.log("cought error on socket", error);
     clearInterval(lookupIntervalId);
   });
 });

@@ -2,6 +2,7 @@
   "compilerOptions": {
     "composite": true,
     "declaration": true /* Generates corresponding '.d.ts' file. */,
+
     /* Visit https://aka.ms/tsconfig.json to read more about this file */
 
     /* Basic Options */
