@@ -7,8 +7,9 @@
   "main": "dist/index.js",
   "bin": "dist/index.js",
   "scripts": {
-    "start": "tsc && node dist/index.js",
-    "build": "tsc"
+    "build:backend": "cd ../backend && yarn build",
+    "build": "yarn tsc && yarn build:backend && cp -r ../backend/dist dist/backend",
+    "start": "yarn build && node dist/index.js"
   },
   "devDependencies": {
     "@types/cbor": "^5.0.1",
