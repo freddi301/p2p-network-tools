@@ -4,11 +4,11 @@
   "private": true,
   "license": "GPL-3.0",
   "author": "Frederik Batuna <gobi301@gmail.com>",
-  "main": "dist/index.js",
-  "bin": "dist/index.js",
+  "main": "dist/backend.js",
+  "bin": "dist/backend.js",
   "scripts": {
-    "start": "tsc && node dist/index.js",
-    "start:watch": "ts-node-dev --respawn ./src/index.ts",
+    "start": "tsc && node dist/backend.js",
+    "start:watch": "ts-node-dev --respawn ./src/backend.ts",
     "build": "tsc"
   },
   "devDependencies": {

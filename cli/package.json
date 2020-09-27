@@ -4,12 +4,12 @@
   "private": true,
   "license": "GPL-3.0",
   "author": "Frederik Batuna <gobi301@gmail.com>",
-  "main": "dist/index.js",
-  "bin": "dist/index.js",
+  "main": "dist/cli.js",
+  "bin": "cli.js",
   "scripts": {
     "build:backend": "cd ../backend && yarn build",
-    "build": "yarn tsc && yarn build:backend && cp -r ../backend/dist dist/backend",
-    "start": "yarn build && node dist/index.js"
+    "build": "yarn build:backend && cp -r ../backend/dist/* ./dist/ && yarn tsc ",
+    "start": "yarn build && node dist/cli.js"
   },
   "devDependencies": {
     "@types/cbor": "^5.0.1",
