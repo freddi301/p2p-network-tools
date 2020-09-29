@@ -1,0 +1,19 @@
+{
+  "folders": [
+    {
+      "path": "cli"
+    },
+    {
+      "path": "desktop-electron"
+    },
+    {
+      "path": "frontend"
+    },
+    {
+      "path": "backend"
+    },
+    {
+      "path": "desktop-explorer-electron"
+    }
+  ]
+}
