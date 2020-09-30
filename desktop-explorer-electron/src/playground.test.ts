@@ -1,2 +1,3 @@
-export const fake = 3;
+export const nothing = 42;
+
 test("nothing", () => {});

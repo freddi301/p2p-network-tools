@@ -10,7 +10,8 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "strict": true,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "incremental": true
   },
   "references": [{ "path": "../backend" }]
 }

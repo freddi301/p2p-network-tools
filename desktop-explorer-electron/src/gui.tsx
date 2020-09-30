@@ -28,7 +28,6 @@ export function start(props: Props) {
 }
 
 function App({ subscribeBlock, provideBlock }: Props) {
-  const [text, setText] = useState("");
   const [tabs, setTabs] = useState<
     Array<{ hash: Buffer; unsubscribe(): void }>
   >([]);
@@ -37,7 +36,6 @@ function App({ subscribeBlock, provideBlock }: Props) {
       // console.log(hash.toString("hex"), block.toString());
     });
     setTabs([{ hash, unsubscribe }, ...tabs]);
-    setText("");
   };
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
   const selectedTab = tabs[selectedTabIndex];
@@ -51,6 +49,16 @@ function App({ subscribeBlock, provideBlock }: Props) {
       };
     }
   }, [selectedTab, subscribeBlock]);
+  const [hashText, setHashText] = useState("");
+  const [editText, setEditText] = useState("");
+  const openHash = () => {
+    const hash = Buffer.from(hashText, "hex");
+    if (hash.length === 32) {
+      addTab(hash);
+      setSelectedTabIndex(0);
+      setHashText("");
+    }
+  };
   return (
     <div
       className={css`
@@ -73,13 +81,26 @@ function App({ subscribeBlock, provideBlock }: Props) {
           background-color: ${colors.backgroundDark};
         `}
       >
-        <button
+        <div
           onClick={() => {
             setSelectedTabIndex(NaN);
           }}
+          className={css`
+            cursor: default;
+            padding: 0ch 1ch;
+            background-color: ${!selectedTab
+              ? colors.backgroundHover
+              : "inherit"};
+            &:hover {
+              background-color: ${colors.backgroundHover};
+            }
+            text-align: center;
+          `}
         >
-          actions
-        </button>
+          <span role="img" aria-label="home">
+            🏠
+          </span>
+        </div>
         {tabs.map((tab, index) => {
           const isOpen = index === selectedTabIndex;
           return (
@@ -172,72 +193,145 @@ function App({ subscribeBlock, provideBlock }: Props) {
       <div
         className={css`
           grid-area: main;
-          padding: 0.5ch 1ch;
         `}
       >
         {selectedTab ? (
-          content?.toString()
+          <div
+            className={css`
+              padding: 1ch;
+            `}
+          >
+            {content?.toString()}
+          </div>
         ) : (
-          <>
-            <h2>Add tab</h2>
-            <input
-              value={text}
-              onChange={(event) => setText(event.currentTarget.value)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") {
-                  const hash = Buffer.from(text, "hex");
-                  if (hash.length === 32) {
-                    addTab(hash);
-                  }
-                }
-              }}
+          <div
+            className={css`
+              display: flex;
+              justify-content: center;
+            `}
+          >
+            <div
               className={css`
-                background-color: inherit;
+                width: 100%;
+                padding: 0 1ch;
               `}
-            />
-            <hr />
-            <h2>Add text block</h2>
-            <AddBlock />
-          </>
+            >
+              <p
+                className={css`
+                  text-align: center;
+                `}
+              >
+                This app lets you share read-only text over internet or your
+                wifi.
+                <br />
+                No account or server needed.
+                <br />
+              </p>
+              <div
+                className={css`
+                  display: flex;
+                  margin: 1em 0;
+                  flex-direction: row-reverse;
+                `}
+              >
+                <div
+                  className={css`
+                    cursor: default;
+                    padding: 0.5em;
+                    background-color: ${colors.backgroundDark};
+                    &:hover {
+                      background-color: ${colors.backgroundHover};
+                    }
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                  `}
+                  onClick={() => {
+                    openHash();
+                  }}
+                >
+                  open
+                </div>
+                <input
+                  placeholder="paste hash"
+                  value={hashText}
+                  onChange={(event) => setHashText(event.currentTarget.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") {
+                      openHash();
+                    }
+                  }}
+                  className={css`
+                    flex-grow: 1;
+                    padding: 0.5em;
+                    background-color: ${colors.backgroundDark};
+                    color: inherit;
+                    font-family: inherit;
+                    font-size: inherit;
+                    border: 0;
+                    outline: 2px dashed ${colors.backgroundLight};
+                    &:focus {
+                      outline: 2px dashed ${colors.blue};
+                    }
+                  `}
+                />
+              </div>
+              <div
+                className={css`
+                  margin: 1em 0;
+                  flex-grow: 1;
+                `}
+              >
+                <textarea
+                  value={editText}
+                  onChange={(event) => setEditText(event.currentTarget.value)}
+                  placeholder="write something smart"
+                  className={css`
+                    width: 100%;
+                    min-height: 400px;
+                    padding: 1em;
+                    resize: none;
+                    background-color: ${colors.backgroundDark};
+                    color: inherit;
+                    font-family: inherit;
+                    font-size: inherit;
+                    border: 0;
+                    outline: 2px dashed ${colors.backgroundLight};
+                    &:focus {
+                      outline: 2px dashed ${colors.blue};
+                    }
+                  `}
+                />
+                <div
+                  onClick={() => {
+                    const block = Buffer.from(editText);
+                    const hash = hashFromBlock(block);
+                    addTab(hash);
+                    setSelectedTabIndex(0);
+                    provideBlock(block);
+                    setEditText("");
+                  }}
+                  className={css`
+                    cursor: default;
+                    padding: 0.5em;
+                    background-color: ${colors.backgroundDark};
+                    &:hover {
+                      background-color: ${colors.backgroundHover};
+                    }
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                  `}
+                >
+                  save
+                </div>
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </div>
   );
-
-  function AddBlock() {
-    const [text, setText] = useState("");
-    const block = Buffer.from(text);
-    const hash = hashFromBlock(block);
-    return (
-      <div>
-        <div
-          className={css`
-            width: 300px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-          `}
-        >
-          {hash.toString("hex")}
-        </div>
-        <textarea
-          value={text}
-          onChange={(event) => setText(event.currentTarget.value)}
-          className={css`
-            width: 300px;
-            background-color: inherit;
-          `}
-        />
-        <button
-          onClick={() => {
-            addTab(hash);
-            provideBlock(block);
-          }}
-        >
-          add
-        </button>
-      </div>
-    );
-  }
 }
 
 const colors = {
