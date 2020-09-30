@@ -1,7 +1,7 @@
 // @ts-ignore
 import hyperswarm from "hyperswarm";
 import CBOR from "cbor";
-import { Protocol, hashFromBlock } from "./protocol";
+import { Protocol, hashFromBlock } from "p2p-network-tools-node-nodejs";
 
 const [, , command, ...params] = process.argv;
 

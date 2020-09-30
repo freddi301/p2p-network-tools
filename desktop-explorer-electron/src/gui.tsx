@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import { css, injectGlobal } from "emotion";
-import { Hash, hashFromBlock } from "./node";
+import { Hash, hashFromBlock } from "p2p-network-tools-node-nodejs";
 
 type Props = {
   subscribeBlock(

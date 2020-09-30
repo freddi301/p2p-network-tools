@@ -2,7 +2,7 @@ import crypto from "crypto";
 import CBOR from "cbor";
 // @ts-ignore
 import hyperswarm from "hyperswarm";
-import { hashFromBlock, Protocol } from "./protocol";
+import { hashFromBlock, Protocol } from "p2p-network-tools-node-nodejs";
 
 const repo = new Map<string, { hash: Buffer; block?: Buffer }>();
 

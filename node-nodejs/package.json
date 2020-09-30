@@ -1,0 +1,24 @@
+{
+  "name": "p2p-network-tools-node-nodejs",
+  "version": "0.0.0",
+  "description": "p2p node",
+  "author": "Frederik Batuna <gobi301@gmail.com>",
+  "license": "GPL-3.0",
+  "private": true,
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
+  "scripts": {
+    "prepare": "yarn build",
+    "build": "tsc",
+    "test": "jest"
+  },
+  "files": [
+    "lib"
+  ],
+  "devDependencies": {
+    "@types/jest": "^26.0.14",
+    "jest": "^26.4.2",
+    "ts-jest": "^26.4.1",
+    "typescript": "^4.0.3"
+  }
+}

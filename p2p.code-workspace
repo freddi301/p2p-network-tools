@@ -4,9 +4,6 @@
       "path": "cli"
     },
     {
-      "path": "desktop-electron"
-    },
-    {
       "path": "frontend"
     },
     {
@@ -14,6 +11,12 @@
     },
     {
       "path": "desktop-explorer-electron"
+    },
+    {
+      "path": "."
+    },
+    {
+      "path": "node-nodejs"
     }
   ]
 }

@@ -1,16 +1,9 @@
-import crypto from "crypto";
 // @ts-ignore
 import hyperswarm from "hyperswarm";
 import CBOR from "cbor";
 import { makeReferenceCountedMap } from "./lib/referenceCountedMap";
 import { makePromiseable } from "./lib/promiseable";
-type Protocol = import("../../backend/src/protocol").Protocol;
-
-export type Hash = Buffer;
-
-export function hashFromBlock(block: Buffer) {
-  return Buffer.from(crypto.createHash("sha256").update(block).digest());
-}
+import { Protocol, Hash, hashFromBlock } from "p2p-network-tools-node-nodejs";
 
 export function start() {
   const hashes = makeReferenceCountedMap({

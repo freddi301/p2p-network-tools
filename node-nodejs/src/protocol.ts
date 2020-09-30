@@ -1,5 +1,7 @@
 import crypto from "crypto";
 
+export type Hash = Buffer;
+
 export type Protocol =
   | {
       type: "do you have block of hash";
@@ -19,5 +21,5 @@ export type Protocol =
     };
 
 export function hashFromBlock(block: Buffer) {
-  return crypto.createHash("sha256").update(block).digest();
+  return Buffer.from(crypto.createHash("sha256").update(block).digest());
 }

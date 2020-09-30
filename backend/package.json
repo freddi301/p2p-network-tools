@@ -11,16 +11,17 @@
     "start:watch": "ts-node-dev --respawn ./src/backend.ts",
     "build": "tsc"
   },
+  "dependencies": {
+    "cbor": "^5.1.0",
+    "hyperswarm": "^2.15.1",
+    "ws": "^7.3.1",
+    "p2p-network-tools-node-nodejs": "0.0.0"
+  },
   "devDependencies": {
     "@types/cbor": "^5.0.1",
     "@types/node": "^14.10.1",
     "@types/ws": "^7.2.6",
     "ts-node-dev": "^1.0.0-pre.62",
     "typescript": "^4.0.2"
-  },
-  "dependencies": {
-    "cbor": "^5.1.0",
-    "hyperswarm": "^2.15.1",
-    "ws": "^7.3.1"
   }
 }
