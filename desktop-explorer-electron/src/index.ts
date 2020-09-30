@@ -1,4 +1,4 @@
 import { start as startGui } from "./gui";
-import { start as startNode } from "./node";
+import { startNode } from "p2p-network-tools-node-nodejs";
 
 startGui(startNode());

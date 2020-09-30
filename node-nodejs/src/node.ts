@@ -3,7 +3,7 @@ import hyperswarm from "hyperswarm";
 import CBOR from "cbor";
 import { makeReferenceCountedMap } from "./lib/referenceCountedMap";
 import { makePromiseable } from "./lib/promiseable";
-import { Protocol, Hash, hashFromBlock } from "p2p-network-tools-node-nodejs";
+import { Protocol, Hash, hashFromBlock } from "./protocol";
 
 export function start() {
   const hashes = makeReferenceCountedMap({
