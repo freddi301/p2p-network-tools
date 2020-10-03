@@ -7,6 +7,7 @@ function createWindow() {
     height: 800,
     minWidth: 600,
     minHeight: 400,
+    backgroundColor: "#282c34",
     webPreferences: {
       nodeIntegration: true,
     },
@@ -39,3 +40,5 @@ app.on("activate", () => {
     createWindow();
   }
 });
+
+declare var MediaRecorder: any;
