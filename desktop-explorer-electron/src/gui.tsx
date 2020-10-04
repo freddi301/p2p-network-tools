@@ -27,7 +27,7 @@ export function start(props: Props) {
 
 function App(props: Props) {
   const [SubApp, setSubApp] = useState<React.ComponentType<Props>>(
-    () => ShareText
+    () => VideoConference
   );
   return (
     <>

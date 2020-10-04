@@ -11,4 +11,5 @@ export const buttonStyle = css`
     background-color: ${colors.backgroundHover};
   }
   transition: 0.3ms;
+  text-align: center;
 `;
