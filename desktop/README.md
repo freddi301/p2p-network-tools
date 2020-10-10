@@ -1,0 +1,1 @@
+`yarn start & yarn start & yarn tsc --watch`

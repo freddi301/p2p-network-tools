@@ -1,19 +1,19 @@
 import { useEffect, useState } from "react";
 
 export type Subject<Value> = {
-  readonly value: Value;
-  readonly publish: (value: Value) => void;
-  readonly subscribe: (subscriber: Subscriber<Value>) => Subscription<Value>;
-  readonly hasSubscriptions: boolean;
+  value: Value;
+  publish(value: Value): void;
+  subscribe(subscriber: Subscriber<Value>): Subscription<Value>;
+  hasSubscriptions: boolean;
 };
 
 export type Subscriber<Value> = (value: Value) => Teardown;
 type Teardown = (() => void) | void;
 
 export type Subscription<Value> = {
-  readonly isSubscribed: boolean;
-  readonly unsubscribe: () => void;
-  readonly subject: Subject<Value>;
+  isSubscribed: boolean;
+  unsubscribe(): void;
+  subject: Subject<Value>;
 };
 
 export function Subject<Value>({
