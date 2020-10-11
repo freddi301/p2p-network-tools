@@ -6,10 +6,7 @@ import { Subject } from "../lib/subject";
 import { Api, HashStaticInterface, HashInfo } from "../apiInterface";
 
 export function startNode<Hash>(hashI: HashStaticInterface<Hash>) {
-  const hashes: Map<
-    string,
-    HashInfo<Hash> & { askedOnConnection: number | undefined }
-  > = new Map();
+  const hashes: Map<string, HashInfo<Hash>> = new Map();
   const connections = new Map<
     number,
     {
@@ -36,6 +33,10 @@ export function startNode<Hash>(hashI: HashStaticInterface<Hash>) {
       hashes.set(hashRawString, created);
       return created;
     }
+  }
+  function getHash(hash: Hash) {
+    const hashRawString = hashI.toRawString(hash);
+    return hashes.get(hashRawString);
   }
   const hashListSubject = Subject<Array<HashInfo<Hash>>>({ initial: [] });
   const connectionCount = Subject({ initial: 0 });
@@ -125,6 +126,20 @@ export function startNode<Hash>(hashI: HashStaticInterface<Hash>) {
         }
         inState.set(hashI.toRawString(hashI.fromBuffer(hash)), state);
       },
+      data({ data }) {
+        const hash = hashI.fromDataBuffer(data);
+        const existing = getHash(hash);
+        if (existing) {
+          existing.data = data;
+          notifyHashList();
+        }
+      },
+      request({ hash }) {
+        const i = getHash(hashI.fromBuffer(hash));
+        if (i && i.data && i.seed) {
+          encoder.write(protocolCbor.serialize.data({ data: i.data }));
+        }
+      },
     });
     decoder.on("data", reaction);
     encoder.write(protocolCbor.serialize.node({ id: myNodeId }));
@@ -139,6 +154,16 @@ export function startNode<Hash>(hashI: HashStaticInterface<Hash>) {
             })
           );
           outState.set(hashI.toRawString(hashInfo.hash), hashSyncState);
+        }
+        if (
+          hashInfo.leech &&
+          inState.get(hashI.toRawString(hashInfo.hash)) === "providing"
+        ) {
+          encoder.write(
+            protocolCbor.serialize.request({
+              hash: hashI.toBuffer(hashInfo.hash),
+            })
+          );
         }
       }
     }, 100);
@@ -203,6 +228,8 @@ function getHashSyncState<Hash>({
 type Protocol = {
   node: { id: Buffer };
   hash: { hash: Buffer; state: HashSyncState };
+  data: { data: Buffer };
+  request: { hash: Buffer };
 };
 type ProtocolImplementation<S> = {
   serialize: { [K in keyof Protocol]: (arg: Protocol[K]) => S };
@@ -217,6 +244,8 @@ const constrain = function <C>(): <T extends C>(value: T) => T {
 const protocolCborType = constrain<{ [K in keyof Protocol]: string }>()({
   node: "node",
   hash: "hash",
+  data: "data",
+  request: "request",
 } as const);
 const protocolCbor: ProtocolImplementation<
   {

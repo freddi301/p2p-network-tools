@@ -120,64 +120,76 @@ function App<Api extends ApiShape>({ api }: { api: Api }) {
           {hashList.map((hashInfo) => {
             const { hash } = hashInfo;
             return (
-              <div
-                key={hash.byteString}
-                className={css`
-                  display: flex;
-                  font-family: ${fonts.mono};
-                `}
-              >
-                <div>{hash.hexString}</div>
+              <div key={hash.byteString}>
                 <div
-                  onClick={() => {
-                    api.updateHash(hash, {
-                      ...hashInfo,
-                      leech: !hashInfo.leech,
-                    });
-                  }}
-                  className={toggleStyle(hashInfo.leech)}
+                  className={css`
+                    font-family: ${fonts.mono};
+                  `}
                 >
-                  leech
+                  {hash.hexString}
                 </div>
                 <div
-                  onClick={() => {
-                    api.updateHash(hash, { ...hashInfo, seed: !hashInfo.seed });
-                  }}
-                  className={toggleStyle(hashInfo.seed)}
+                  className={css`
+                    display: flex;
+                  `}
                 >
-                  seed
+                  <div
+                    onClick={() => {
+                      api.updateHash(hash, {
+                        ...hashInfo,
+                        leech: !hashInfo.leech,
+                      });
+                    }}
+                    className={toggleStyle(hashInfo.leech)}
+                  >
+                    leech
+                  </div>
+                  <div
+                    onClick={() => {
+                      api.updateHash(hash, {
+                        ...hashInfo,
+                        seed: !hashInfo.seed,
+                      });
+                    }}
+                    className={toggleStyle(hashInfo.seed)}
+                  >
+                    seed
+                  </div>
+                  <div
+                    onClick={() => {
+                      api.updateHash(hash, {
+                        ...hashInfo,
+                        keep: !hashInfo.keep,
+                      });
+                    }}
+                    className={toggleStyle(hashInfo.keep)}
+                  >
+                    keep
+                  </div>{" "}
+                  <div
+                    onClick={() => {
+                      api.updateHash(hash, {
+                        ...hashInfo,
+                        lookup: !hashInfo.lookup,
+                      });
+                    }}
+                    className={toggleStyle(hashInfo.lookup)}
+                  >
+                    lookup
+                  </div>
+                  <div
+                    onClick={() => {
+                      api.updateHash(hash, {
+                        ...hashInfo,
+                        announce: !hashInfo.announce,
+                      });
+                    }}
+                    className={toggleStyle(hashInfo.announce)}
+                  >
+                    announce
+                  </div>
+                  <div>{hashInfo.data && hashInfo.data.toString()}</div>
                 </div>
-                <div
-                  onClick={() => {
-                    api.updateHash(hash, { ...hashInfo, keep: !hashInfo.keep });
-                  }}
-                  className={toggleStyle(hashInfo.keep)}
-                >
-                  keep
-                </div>{" "}
-                <div
-                  onClick={() => {
-                    api.updateHash(hash, {
-                      ...hashInfo,
-                      lookup: !hashInfo.lookup,
-                    });
-                  }}
-                  className={toggleStyle(hashInfo.lookup)}
-                >
-                  lookup
-                </div>
-                <div
-                  onClick={() => {
-                    api.updateHash(hash, {
-                      ...hashInfo,
-                      announce: !hashInfo.announce,
-                    });
-                  }}
-                  className={toggleStyle(hashInfo.announce)}
-                >
-                  announce
-                </div>
-                <div>{hashInfo.data && hashInfo.data.toString()}</div>
               </div>
             );
           })}
