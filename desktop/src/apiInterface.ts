@@ -1,6 +1,6 @@
 import { Subject } from "./lib/subject";
 
-export type Api<Hash> = {
+export type Api<Hash extends HashInterface> = {
   hash: HashStaticInterface<Hash>;
   connectionCount: Subject<number>;
   hashListSubject: Subject<Array<HashInfo<Hash>>>;
@@ -17,18 +17,20 @@ export type Api<Hash> = {
   addDataString(data: string): void;
   addDataBuffer(data: Buffer): void;
 };
-export type ApiShape = Api<any>;
 
-export type HashStaticInterface<Hash> = {
+export type HashStaticInterface<Hash extends HashInterface> = {
   isValidHex(text: string): boolean;
   fromHex(text: string): Hash;
-  toHex(hash: Hash): string;
   isValidBuffer(buffer: Buffer): boolean;
-  toBuffer(hash: Hash): Buffer;
   fromBuffer(buffer: Buffer): Hash;
   fromDataString(data: string): Hash;
   fromDataBuffer(data: Buffer): Hash;
-  toRawString(hash: Hash): string;
+};
+
+export type HashInterface = {
+  asHexString: string;
+  asBuffer: Buffer;
+  asRawString: string;
 };
 
 export type HashInfo<Hash> = {

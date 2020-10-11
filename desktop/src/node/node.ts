@@ -3,9 +3,16 @@ import { randomBytes } from "crypto";
 import hyperswarm from "hyperswarm";
 import cbor from "cbor";
 import { Subject } from "../lib/subject";
-import { Api, HashStaticInterface, HashInfo } from "../apiInterface";
+import {
+  Api,
+  HashStaticInterface,
+  HashInfo,
+  HashInterface,
+} from "../apiInterface";
 
-export function startNode<Hash>(hashI: HashStaticInterface<Hash>) {
+export function startNode<Hash extends HashInterface>(
+  hashI: HashStaticInterface<Hash>
+) {
   const hashes: Map<string, HashInfo<Hash>> = new Map();
   const connections = new Map<
     number,
@@ -15,8 +22,7 @@ export function startNode<Hash>(hashI: HashStaticInterface<Hash>) {
     }
   >();
   function getOrCreateHash(hash: Hash) {
-    const hashRawString = hashI.toRawString(hash);
-    const existing = hashes.get(hashRawString);
+    const existing = hashes.get(hash.asRawString);
     if (existing) {
       return existing;
     } else {
@@ -30,13 +36,12 @@ export function startNode<Hash>(hashI: HashStaticInterface<Hash>) {
         data: undefined,
         askedOnConnection: undefined,
       };
-      hashes.set(hashRawString, created);
+      hashes.set(hash.asRawString, created);
       return created;
     }
   }
   function getHash(hash: Hash) {
-    const hashRawString = hashI.toRawString(hash);
-    return hashes.get(hashRawString);
+    return hashes.get(hash.asRawString);
   }
   const hashListSubject = Subject<Array<HashInfo<Hash>>>({ initial: [] });
   const connectionCount = Subject({ initial: 0 });
@@ -124,7 +129,7 @@ export function startNode<Hash>(hashI: HashStaticInterface<Hash>) {
           console.log("invalid message");
           return;
         }
-        inState.set(hashI.toRawString(hashI.fromBuffer(hash)), state);
+        inState.set(hashI.fromBuffer(hash).asRawString, state);
       },
       data({ data }) {
         const hash = hashI.fromDataBuffer(data);
@@ -146,22 +151,22 @@ export function startNode<Hash>(hashI: HashStaticInterface<Hash>) {
     const intervalId = setInterval(() => {
       for (const hashInfo of hashes.values()) {
         const hashSyncState = getHashSyncState(hashInfo);
-        if (hashSyncState !== outState.get(hashI.toRawString(hashInfo.hash))) {
+        if (hashSyncState !== outState.get(hashInfo.hash.asRawString)) {
           encoder.write(
             protocolCbor.serialize.hash({
-              hash: hashI.toBuffer(hashInfo.hash),
+              hash: hashInfo.hash.asBuffer,
               state: hashSyncState,
             })
           );
-          outState.set(hashI.toRawString(hashInfo.hash), hashSyncState);
+          outState.set(hashInfo.hash.asRawString, hashSyncState);
         }
         if (
           hashInfo.leech &&
-          inState.get(hashI.toRawString(hashInfo.hash)) === "providing"
+          inState.get(hashInfo.hash.asRawString) === "providing"
         ) {
           encoder.write(
             protocolCbor.serialize.request({
-              hash: hashI.toBuffer(hashInfo.hash),
+              hash: hashInfo.hash.asBuffer,
             })
           );
         }
@@ -178,13 +183,12 @@ export function startNode<Hash>(hashI: HashStaticInterface<Hash>) {
     hash: Hash,
     { lookup, announce }: { lookup: boolean; announce: boolean }
   ) {
-    const hashBuffer = hashI.toBuffer(hash);
     const shouldLeave = lookup === false && announce === false;
-    const topicStatus = swarm.status(hashBuffer);
+    const topicStatus = swarm.status(hash.asBuffer);
     if (shouldLeave) {
       if (topicStatus) {
-        swarm.leave(hashBuffer);
-        console.log("leaving", hashI.toHex(hash), hashI.toBuffer(hash));
+        swarm.leave(hash.asBuffer);
+        console.log("leaving", hash.asHexString, hash.asBuffer);
       }
     } else {
       if (topicStatus) {
@@ -192,21 +196,21 @@ export function startNode<Hash>(hashI: HashStaticInterface<Hash>) {
           topicStatus.lookup !== lookup ||
           topicStatus.announce !== announce
         ) {
-          swarm.join(hashBuffer, { lookup, announce });
+          swarm.join(hash.asBuffer, { lookup, announce });
           console.log(
             "joining",
-            hashI.toHex(hash),
+            hash.asHexString,
             { lookup, announce },
-            hashI.toBuffer(hash)
+            hash.asBuffer
           );
         }
       } else {
-        swarm.join(hashBuffer, { lookup, announce });
+        swarm.join(hash.asBuffer, { lookup, announce });
         console.log(
           "joining",
-          hashI.toHex(hash),
+          hash.asHexString,
           { lookup, announce },
-          hashI.toBuffer(hash)
+          hash.asBuffer
         );
       }
     }

@@ -1,5 +1,5 @@
 import { createHash } from "crypto";
-import { HashStaticInterface } from "../apiInterface";
+import { HashStaticInterface, HashInterface } from "../apiInterface";
 
 export const sha256: HashStaticInterface<SHA256> = {
   isValidHex(text: string) {
@@ -9,17 +9,11 @@ export const sha256: HashStaticInterface<SHA256> = {
     const buffer = Buffer.from(text, "hex");
     return new SHA256(buffer);
   },
-  toHex(hash: SHA256) {
-    return hash.hexString;
-  },
   isValidBuffer(buffer: Buffer) {
     return buffer.length === 32;
   },
   fromBuffer(buffer: Buffer) {
     return new SHA256(Buffer.from(buffer));
-  },
-  toBuffer(hash: SHA256) {
-    return hash.buffer;
   },
   fromDataString(data: string) {
     return new SHA256(Buffer.from(createHash("sha256").update(data).digest()));
@@ -27,20 +21,17 @@ export const sha256: HashStaticInterface<SHA256> = {
   fromDataBuffer(data: Buffer) {
     return new SHA256(Buffer.from(createHash("sha256").update(data).digest()));
   },
-  toRawString(hash: SHA256) {
-    return hash.byteString;
-  },
 };
 
-class SHA256 {
-  buffer: Buffer;
-  byteString: string;
-  hexString: string;
+class SHA256 implements HashInterface {
+  asBuffer: Buffer;
+  asRawString: string;
+  asHexString: string;
   constructor(buffer: Buffer) {
     if (!Buffer.isBuffer(buffer)) throw new Error("invalid buffer");
     if (buffer.length !== 32) throw new Error("invalid buffer length");
-    this.buffer = buffer;
-    this.byteString = buffer.toString("utf8");
-    this.hexString = buffer.toString("hex");
+    this.asBuffer = buffer;
+    this.asRawString = buffer.toString("utf8");
+    this.asHexString = buffer.toString("hex");
   }
 }

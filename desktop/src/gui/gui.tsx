@@ -4,9 +4,9 @@ import ReactDOM from "react-dom";
 import { ipcRenderer } from "electron";
 import { useState } from "react";
 import { useSubject } from "../lib/subject";
-import { ApiShape } from "../apiInterface";
+import { Api, HashInterface } from "../apiInterface";
 
-export function startGui<Api extends ApiShape>(api: Api) {
+export function startGui<A extends Api<any>>(api: A) {
   ReactDOM.render(
     <React.StrictMode>
       <App api={api} />
@@ -42,7 +42,7 @@ injectGlobal`
   @import url('https://fonts.googleapis.com/css2?family=Ubuntu+Mono&display=swap');
 `;
 
-function App<Api extends ApiShape>({ api }: { api: Api }) {
+function App<H extends HashInterface, A extends Api<H>>({ api }: { api: A }) {
   const [text, setText] = useState("");
   const hashList = useSubject(api.hashListSubject);
   const connections = useSubject(api.connectionCount);
@@ -120,13 +120,13 @@ function App<Api extends ApiShape>({ api }: { api: Api }) {
           {hashList.map((hashInfo) => {
             const { hash } = hashInfo;
             return (
-              <div key={hash.byteString}>
+              <div key={hash.asRawString}>
                 <div
                   className={css`
                     font-family: ${fonts.mono};
                   `}
                 >
-                  {hash.hexString}
+                  {hash.asHexString}
                 </div>
                 <div
                   className={css`
@@ -246,12 +246,16 @@ const toggleStyleDisabled = css`
   color: ${colors.gray};
 `;
 
-function HashOfText<Api extends ApiShape>({ api }: { api: Api }) {
+function HashOfText<H extends HashInterface, A extends Api<any>>({
+  api,
+}: {
+  api: A;
+}) {
   const [text, setText] = useState("");
   const hash = api.hash.fromDataString(text);
   return (
     <div>
-      <div>{api.hash.toHex(hash)}</div>
+      <div>{hash.asHexString}</div>
       <div
         onClick={() => {
           api.addDataBuffer(Buffer.from(text));
