@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    "esModuleInterop": true,
+    "jsx": "react",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "target": "ES6",
+    "skipLibCheck": true,
+    "strict": true,
+    "isolatedModules": true,
+    "incremental": true,
+    "lib": ["ESNext", "DOM"],
+    "inlineSourceMap": true,
+    "inlineSources": true
+  }
+}

@@ -23,6 +23,9 @@
     },
     {
       "path": "desktop"
+    },
+    {
+      "path": "flood-desktop"
     }
   ]
 }
