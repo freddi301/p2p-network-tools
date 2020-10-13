@@ -6,6 +6,8 @@ import { ipcRenderer } from "electron";
 import hyperswarm from "hyperswarm";
 import { createHash, randomBytes } from "crypto";
 import cbor from "cbor";
+import levelup from "levelup";
+import leveldown from "leveldown";
 
 setTimeout(() => {
   ReactDOM.render(
@@ -161,6 +163,14 @@ swarm.on("connection", (socket: any, info: any) => {
     console.log(`connection ${connectionId} closed`);
     unsubscribeBlocks(propagate);
   });
+});
+
+const db = levelup(leveldown(process.env.FLOOD_DB || "./flood-db"));
+subscribeBlocks((hash, data) => {
+  db.put(hash, data);
+});
+db.createReadStream().on("data", function (data) {
+  addBufferBlock(data.value);
 });
 
 function Chat() {
