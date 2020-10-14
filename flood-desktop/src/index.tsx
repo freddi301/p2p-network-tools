@@ -150,13 +150,34 @@ injectGlobal`
     @import url("https://fonts.googleapis.com/css2?family=Ubuntu+Mono&display=swap");
   }
   ::-webkit-scrollbar {
-    width: 1em;
-  }
-  ::-webkit-scrollbar-track {
-    background-color: ${colors.backgroundDark};
+    width: 16px;
+    height: 16px;
   }
   ::-webkit-scrollbar-thumb {
-    background-color: ${colors.backgroundFocus};
+    min-height: 40px;
+  }
+  ::-webkit-scrollbar-track, ::-webkit-scrollbar-thumb {
+    border: 4px solid transparent;
+    background-clip: padding-box;
+    border-radius: 8px;
+  }
+`;
+
+const scrollStyleLight = css`
+  &:hover::-webkit-scrollbar-track {
+    background-color: ${colors.backgroundDark};
+  }
+  &:hover::-webkit-scrollbar-thumb {
+    background-color: ${colors.blue};
+  }
+`;
+
+const scrollStyleDark = css`
+  &:hover::-webkit-scrollbar-track {
+    background-color: ${colors.background};
+  }
+  &:hover::-webkit-scrollbar-thumb {
+    background-color: ${colors.blue};
   }
 `;
 
@@ -203,8 +224,6 @@ function App() {
   const [me, setMe] = useState("fred");
   const [recipient, setRecipient] = useState("");
   const conversation = useConversation(me, recipient);
-  const [messageText, setMessageText] = useState("");
-  const [messageTextRows, setMessageTextRows] = useState(1);
   const [tail, setTail] = useState(true);
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   useLayoutEffect(() => {
@@ -283,6 +302,7 @@ function App() {
           <input
             value={newContactName}
             onChange={(event) => setNewContactName(event.currentTarget.value)}
+            spellCheck={false}
             className={css`
               ${inputStyleMedium};
               padding-right: 3em;
@@ -310,12 +330,14 @@ function App() {
             overflow-x: hidden;
             overflow-y: overlay;
             position: relative;
+            ${scrollStyleDark};
           `}
         >
           <div
             className={css`
               position: absolute;
               width: 100%;
+              padding-bottom: 4px;
             `}
           >
             {contacts.alphaOrderedList.map((contact) => {
@@ -326,16 +348,57 @@ function App() {
                     setRecipient(contact.name);
                   }}
                   className={css`
-                    padding: 16px 1em;
                     &:hover {
                       background-color: ${colors.backgroundHover};
                     }
+                    display: flex;
+                    align-items: center;
+                    padding-left: 1em;
                   `}
                 >
-                  {contact.name || "John Doe"}
+                  <div
+                    className={css`
+                      width: 48px;
+                      height: 48px;
+                      border-radius: 4px;
+                      background-color: ${colors.background};
+                    `}
+                  />
+                  <div
+                    className={css`
+                      padding: 16px 1em;
+                    `}
+                  >
+                    {contact.name || "John Doe"}
+                  </div>
                 </div>
               );
             })}
+          </div>
+        </div>
+        <div
+          className={css`
+            border-top: 1px solid ${colors.backgroundLight};
+            display: flex;
+            align-items: center;
+            padding: 1em;
+          `}
+        >
+          <div>me</div>
+          <div
+            className={css`
+              flex-grow: 1;
+            `}
+          >
+            <input
+              value={me}
+              onChange={(event) => setMe(event.currentTarget.value)}
+              spellCheck={false}
+              className={css`
+                ${inputStyle};
+                width: 100%;
+              `}
+            />
           </div>
         </div>
       </div>
@@ -354,15 +417,13 @@ function App() {
             flex-grow: 1;
             overflow-x: hidden;
             overflow-y: overlay;
+            ${scrollStyleLight};
           `}
         >
           <div
             className={css`
               position: absolute;
-              display: grid;
-              grid-template-columns: [date] auto [display-name] auto [text] 1fr;
-              grid-column-gap: 1ch;
-              padding: 1em;
+              width: 100%;
             `}
           >
             {conversation.chronoOrderedList.map((message, index, array) => {
@@ -371,89 +432,210 @@ function App() {
                   ? me
                   : message.sender === recipient
                   ? recipient
-                  : null;
+                  : undefined;
+              const previous = array[index - 1];
+              const previousFormattedDate =
+                previous && formatMessageDate(previous.date);
+              const formattedDate = formatMessageDate(message.date);
+              const showDayHeader =
+                !previous || formattedDate !== previousFormattedDate;
+              const showContactHeader =
+                showDayHeader ||
+                !previous ||
+                message.sender !== previous.sender;
               return (
                 <React.Fragment key={message.id}>
+                  {showDayHeader && (
+                    <div
+                      className={css`
+                        position: sticky;
+                        top: 0;
+                        background-color: ${colors.background};
+                        color: ${colors.gray};
+                        border-bottom: 1px solid ${colors.backgroundLight};
+                        margin: 1em;
+                      `}
+                    >
+                      {formatMessageDate(message.date)}
+                    </div>
+                  )}
+                  {showContactHeader && (
+                    <div
+                      className={css`
+                        margin-top: ${showContactHeader ? "1em" : "0"};
+                      `}
+                    >
+                      <ContactHeader name={displayName} />
+                    </div>
+                  )}
                   <div
                     className={css`
-                      grid-column: date;
-                      color: ${colors.gray};
+                      display: flex;
+                      padding: 0 0 0 1em;
                     `}
-                    style={{ gridRow: index + 1 }}
                   >
-                    {message.date.toLocaleString()}
-                  </div>
-                  <div
-                    className={css`
-                      grid-column: display-name;
-                      font-weight: 500;
-                    `}
-                    style={{ gridRow: index + 1 }}
-                  >
-                    {displayName}
-                  </div>
-                  <div
-                    className={css`
-                      grid-column: text;
-                      white-space: pre;
-                    `}
-                    style={{ gridRow: index + 1 }}
-                    ref={(element) => {
-                      if (tail && element && index + 1 === array.length) {
-                        element.scrollIntoView({ behavior: "smooth" });
-                      }
-                    }}
-                  >
-                    {message.text}
+                    <div
+                      className={css`
+                        color: ${colors.gray};
+                        width: 42px;
+                        text-align: center;
+                      `}
+                    >
+                      {formatMessageTime(message.date)}
+                    </div>
+                    <div
+                      className={css`
+                        white-space: pre;
+                        padding: 0 1em;
+                      `}
+                      ref={(element) => {
+                        if (tail && element && index + 1 === array.length) {
+                          element.scrollIntoView({ behavior: "smooth" });
+                        }
+                      }}
+                    >
+                      {message.text}
+                    </div>
                   </div>
                 </React.Fragment>
               );
             })}
           </div>
         </div>
-        <div
-          className={css`
-            padding: 1em;
-            display: flex;
-            align-items: flex-end;
-          `}
-        >
-          <textarea
-            value={messageText}
-            onChange={(event) => {
-              setMessageText(event.currentTarget.value);
-              const rows = Math.min(
-                10,
-                (event.currentTarget.value.match(/\n/g)?.length ?? 0) + 1
-              );
-              setMessageTextRows(rows);
-            }}
-            rows={messageTextRows}
-            className={css`
-              ${inputStyleMedium};
-              resize: none;
-              overflow-x: auto;
-              overflow-y: auto;
-              flex-grow: 1;
-              padding-right: 6em;
-            `}
-          />
-          <button
-            onClick={() => {
-              conversation.send(messageText);
-              setMessageText("");
-            }}
-            className={css`
-              ${buttonStyleMedium};
-              margin-left: 1em;
-            `}
-          >
-            send
-          </button>
-        </div>
+        <MessageCompositor me={me} onSend={conversation.send} />
       </div>
     </div>
   );
+}
+
+let messageTimeFormatter = new Intl.DateTimeFormat([], {
+  timeStyle: "short",
+} as any);
+
+function MessageCompositor({
+  me,
+  onSend,
+}: {
+  me: string;
+  onSend(text: string): void;
+}) {
+  const [messageText, setMessageText] = useState("");
+  const [messageTextRows, setMessageTextRows] = useState(1);
+
+  return (
+    <div
+      className={css`
+        margin-top: 0.5em;
+        padding-top: 0.5em;
+        border-top: 1px solid ${colors.backgroundLight};
+      `}
+    >
+      <ContactHeader name={me} />
+      <div
+        className={css`
+          display: flex;
+          padding: 0 1em 1em 1em;
+        `}
+      >
+        <div
+          className={css`
+            color: ${colors.gray};
+            width: 42px;
+            text-align: center;
+          `}
+        >
+          {formatMessageTime(new Date())}
+        </div>
+        <textarea
+          value={messageText}
+          onChange={(event) => {
+            setMessageText(event.currentTarget.value);
+            const rows = Math.min(
+              10,
+              (event.currentTarget.value.match(/\n/g)?.length ?? 0) + 1
+            );
+            setMessageTextRows(rows);
+          }}
+          rows={messageTextRows}
+          spellCheck={false}
+          className={css`
+            ${inputStyle};
+            resize: none;
+            overflow-x: auto;
+            overflow-y: auto;
+            flex-grow: 1;
+            padding: 0em;
+            margin-left: 1em;
+            background-color: ${colors.background};
+            ${scrollStyleDark};
+          `}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" && !event.shiftKey) {
+              event.preventDefault();
+              onSend(messageText);
+              setMessageText("");
+            }
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
+function ContactHeader({ name }: { name?: string }) {
+  return (
+    <div
+      className={css`
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        grid-template-rows: auto auto auto;
+        grid-column-gap: 1em;
+        padding: 0 1em;
+        background-color: ${colors.background};
+      `}
+    >
+      <div
+        className={css`
+          width: 42px;
+          height: 42px;
+          border-radius: 4px;
+          background-color: ${colors.backgroundDark};
+          grid-column: 1;
+          grid-row: 1 / span 2;
+        `}
+      />
+      <div
+        className={css`
+          grid-column: 2;
+          grid-row: 1;
+          font-weight: 500;
+          color: ${colors.gray};
+        `}
+      >
+        {name}
+      </div>
+      <div
+        className={css`
+          grid-column: 2;
+          grid-row: 2;
+          color: ${colors.gray};
+        `}
+      >
+        {name}
+      </div>
+    </div>
+  );
+}
+
+function formatMessageTime(date: Date) {
+  return messageTimeFormatter.format(date);
+}
+
+let messageDateFormatter = new Intl.DateTimeFormat([], {
+  dateStyle: "full",
+} as any);
+function formatMessageDate(date: Date) {
+  return messageDateFormatter.format(date);
 }
 
 type Contact = {
